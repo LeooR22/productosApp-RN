@@ -8,6 +8,7 @@ import {
   ProtectedScreen,
   LoadingScreen,
 } from '../screens';
+import {ProductsNavigator} from './ProductsNavigator';
 
 const Stack = createStackNavigator();
 
@@ -30,7 +31,13 @@ export const Navigator = () => {
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
         </>
       ) : (
-        <Stack.Screen name="ProtectedScreen" component={ProtectedScreen} />
+        <>
+          <Stack.Screen
+            name="ProductsNavigator"
+            component={ProductsNavigator}
+          />
+          <Stack.Screen name="ProtectedScreen" component={ProtectedScreen} />
+        </>
       )}
     </Stack.Navigator>
   );

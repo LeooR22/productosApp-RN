@@ -40,7 +40,6 @@ export const RegisterScreen: FC<Props> = ({navigation}) => {
   }, [errorMessage]);
 
   const onRegister = () => {
-    console.log({email, password, name});
     Keyboard.dismiss();
     signUp({correo: email, password, nombre: name});
   };

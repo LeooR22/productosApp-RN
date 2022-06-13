@@ -38,7 +38,6 @@ export const LoginScreen: FC<Props> = ({navigation}) => {
   }, [errorMessage]);
 
   const onLogin = () => {
-    console.log({email, password});
     Keyboard.dismiss();
     signIn({correo: email, password});
   };
