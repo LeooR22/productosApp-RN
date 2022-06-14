@@ -3,6 +3,7 @@ import {ProductsContext, productsReducer} from './';
 import {Producto, ProductsResponse} from '../interfaces/appInterfaces';
 import {useState, useEffect} from 'react';
 import productsApi from '../api/productsApi';
+import {Asset} from 'react-native-image-picker';
 
 export interface ProductsState {
   products: Producto[];
@@ -63,7 +64,28 @@ export const ProductsProvider: FC<Props> = ({children}) => {
 
     return data;
   };
-  const uploadImage = async (data: any, id: string) => {};
+  const uploadImage = async (data: Asset, id: string) => {
+    const fileToUpload = {
+      uri: data.uri,
+      type: data.type,
+      name: data.fileName,
+    };
+
+    const formData = new FormData();
+    formData.append('archivo', fileToUpload);
+
+    const baseURL = 'http://192.168.56.1:8080/api';
+
+    try {
+      const resp = await fetch(`${baseURL}/uploads/productos/${id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+      console.log(resp);
+    } catch (error) {
+      console.log({error});
+    }
+  };
 
   return (
     <ProductsContext.Provider

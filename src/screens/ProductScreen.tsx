@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useContext} from 'react';
+import React, {FC, useEffect, useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -18,14 +18,18 @@ import {LoadingScreen} from './LoadingScreen';
 import {useForm} from '../hooks/useForm';
 import {ProductsContext} from '../context';
 
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
 interface Props
   extends StackScreenProps<ProductsStackParams, 'ProductScreen'> {}
 
 export const ProductScreen: FC<Props> = ({navigation, route}) => {
-  const {loadProductById, addProduct, updateProduct} =
+  const {loadProductById, addProduct, updateProduct, uploadImage} =
     useContext(ProductsContext);
 
   const {id = '', name = ''} = route.params;
+
+  const [tempUri, setTempUri] = useState<string>('');
 
   const {categories, isLoading} = useCategories();
   const {_id, categoriaId, nombre, imagen, form, onChange, setFormValue} =
@@ -72,6 +76,36 @@ export const ProductScreen: FC<Props> = ({navigation, route}) => {
     onChange(newProduct._id, '_id');
   };
 
+  const takePhoto = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.5,
+      },
+      resp => {
+        if (resp.didCancel) return;
+        if (!resp.assets![0].uri) return;
+        setTempUri(resp.assets![0].uri);
+        uploadImage(resp.assets![0], _id);
+      },
+    );
+  };
+
+  const takePhotoFromGallery = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.5,
+      },
+      resp => {
+        if (resp.didCancel) return;
+        if (!resp.assets![0].uri) return;
+        setTempUri(resp.assets![0].uri);
+        uploadImage(resp.assets![0], _id);
+      },
+    );
+  };
+
   if (isLoading === true) return <LoadingScreen />;
 
   return (
@@ -106,13 +140,17 @@ export const ProductScreen: FC<Props> = ({navigation, route}) => {
               justifyContent: 'center',
               marginTop: 10,
             }}>
-            <Button title="Camara" onPress={() => {}} color="#5856D6" />
+            <Button title="Camara" onPress={takePhoto} color="#5856D6" />
             <View style={{width: 10}} />
-            <Button title="Galeria" onPress={() => {}} color="#5856D6" />
+            <Button
+              title="Galeria"
+              onPress={takePhotoFromGallery}
+              color="#5856D6"
+            />
           </View>
         )}
 
-        {imagen.length > 0 && (
+        {imagen.length > 0 && !tempUri && (
           <Image
             source={{uri: imagen}}
             style={{width: '100%', height: 300, marginTop: 20}}
@@ -120,6 +158,13 @@ export const ProductScreen: FC<Props> = ({navigation, route}) => {
         )}
 
         {/* TODO:  Mostrar imagen temporal */}
+
+        {tempUri.length > 0 && (
+          <Image
+            source={{uri: tempUri}}
+            style={{width: '100%', height: 300, marginTop: 20}}
+          />
+        )}
       </ScrollView>
     </View>
   );
